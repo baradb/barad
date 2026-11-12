@@ -1,5 +1,6 @@
 import { Icon } from "@/components/Icon";
-import { PhotoSlot, VideoSlot } from "@/components/Media";
+import Image from "next/image";
+import { MediaRow, PhotoSlot, VideoSlot } from "@/components/Media";
 import type { CoverInfo } from "@/lib/spotify";
 import type { Cover, Interest } from "@/data/interests";
 
@@ -110,28 +111,24 @@ export function InterestPanel({
         </dl>
       )}
 
-      {interest.items && interest.items.length > 0 && (
-        <ul className="mt-6 divide-y divide-rule border-y border-rule text-sm text-muted">
-          {interest.items.map((item) => (
-            <li key={item} className="py-3">
-              {item}
-            </li>
-          ))}
-        </ul>
-      )}
-
       {interest.pieces && interest.pieces.length > 0 && (
-        <ul className="mt-8 grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3">
-          {interest.pieces.map((piece, i) => (
-            <li key={`${piece.title}-${i}`}>
-              <PhotoSlot
-                image={piece.image}
-                ratio="aspect-square"
-                label="Artwork"
-                sizes="(min-width: 672px) 216px, 50vw"
-              />
-              <p className="mt-3 text-base font-medium">{piece.title}</p>
-              <p className="text-sm text-faint">{piece.tool}</p>
+        <ul className={`${interest.blurb ? "mt-8" : ""} space-y-12`}>
+          {interest.pieces.map((piece) => (
+            <li key={piece.title}>
+              {piece.image ? (
+                <Image
+                  src={piece.image.src}
+                  alt={piece.image.alt}
+                  width={piece.image.width}
+                  height={piece.image.height}
+                  sizes="(min-width: 720px) 672px, 100vw"
+                  className="h-auto w-full rounded-xl border border-rule"
+                />
+              ) : (
+                <PhotoSlot ratio="aspect-[3/2]" label="Artwork" />
+              )}
+              <p className="mt-4 text-lg font-medium">{piece.title}</p>
+              <p className="text-sm text-faint">{piece.tools.join(" · ")}</p>
             </li>
           ))}
         </ul>
@@ -139,11 +136,11 @@ export function InterestPanel({
 
       {interest.video && (
         <figure className="mt-10">
-          <VideoSlot
-            youtubeId={interest.video.youtubeId}
-            videoSrc={interest.video.videoSrc}
-            title={interest.video.title}
-          />
+          {interest.video.item ? (
+            <MediaRow items={[interest.video.item]} />
+          ) : (
+            <VideoSlot title="Video" />
+          )}
           {interest.video.caption && (
             <figcaption className="mt-3 max-w-[52ch] text-sm leading-6 text-muted">
               {interest.video.caption}

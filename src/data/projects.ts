@@ -3,18 +3,10 @@
  * working on" (and is peeked at on the About page); `projects` are the finished ones.
  *
  * Media: files live in public/projects/. Each project lists its photos and videos in
- * `media`, and the page lays them out in one row at a shared height, uncropped.
- * Give each item its real pixel size so the row can reserve the right space:
- *   { type: "image", src: "/projects/x.jpg", alt: "what it shows", width: 1200, height: 1600 }
- *   { type: "video", src: "/projects/x.mp4", poster: "/projects/x-poster.jpg",
- *     label: "what it shows", width: 640, height: 488 }
- * Videos should be H.264 MP4 (phone HEVC .mov files do not play in every browser), and
- * every file should have location/EXIF data stripped, since the repo is public.
- * With no media, two empty photo slots show instead.
+ * `media` (see src/data/media.ts for the shape and the rules), and the page lays them
+ * out in one row at a shared height, uncropped. With no media, two empty photo slots show.
  */
-export type Media =
-  | { type: "image"; src: string; alt: string; width: number; height: number }
-  | { type: "video"; src: string; poster: string; label: string; width: number; height: number };
+import type { Media } from "@/data/media";
 
 export type Project = {
   name: string;

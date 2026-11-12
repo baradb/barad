@@ -1,12 +1,13 @@
+import type { Media } from "@/data/media";
+
 /**
  * Interests, one subtab each on /interests.
  *
+ * - `blurb`: an opening line.
  * - `rows`: label/value rows. A row can hold text, a list of lines, or a Spotify
  *   cover (album or artist art is fetched from Spotify by id; no key needed).
- * - `items`: a plain list.
- * - `pieces`: a gallery of artwork. Add a file in public/art/ and set `image`.
- * - `video`: one video shown at the bottom. Set `youtubeId` (the part after v=) or
- *   `videoSrc` (a file in public/videos/). With neither, an empty slot shows.
+ * - `pieces`: artwork shown full width, uncropped (files in public/art/).
+ * - `video`: one video at the bottom (files in public/videos/); see src/data/media.ts.
  */
 export type Cover = {
   kind: "album" | "artist";
@@ -24,8 +25,8 @@ export type Row = {
 
 export type Piece = {
   title: string;
-  tool: string;
-  image?: { src: string; alt: string };
+  tools: string[];
+  image?: { src: string; alt: string; width: number; height: number };
 };
 
 export type Interest = {
@@ -33,9 +34,8 @@ export type Interest = {
   label: string;
   blurb?: string;
   rows?: Row[];
-  items?: string[];
   pieces?: Piece[];
-  video?: { title: string; caption?: string; youtubeId?: string; videoSrc?: string };
+  video?: { caption?: string; item?: Media };
 };
 
 export const interests: Interest[] = [
@@ -62,34 +62,77 @@ export const interests: Interest[] = [
   {
     id: "guitar",
     label: "Guitar",
-    blurb: "Placeholder. How long you've played and what you're into.",
     rows: [
       {
         label: "Recently learned",
-        lines: ["Placeholder song · Artist", "Another placeholder song · Artist"],
+        lines: ["Wash It Down · Ethos", "Seek and Destroy · Metallica"],
       },
-      { label: "Like to play", text: "Placeholder. The kind of songs or players you gravitate to." },
-      { label: "Working on", text: "Placeholder. What's next on the list." },
+      {
+        label: "Like to play",
+        text: "Metal songs, midwest emo songs, indie songs. (I know, wide range.)",
+      },
+      { label: "Working on", text: "Learning the Master of Puppets guitar solo." },
     ],
     video: {
-      title: "Guitar video",
-      caption: "Placeholder. A song you've been playing lately.",
+      caption: "All in My Head · Computer",
+      item: {
+        type: "video",
+        src: "/videos/guitar-all-in-my-head.mp4",
+        poster: "/videos/guitar-all-in-my-head-poster.jpg",
+        label: "Guitar video: All in My Head by Computer",
+        width: 640,
+        height: 288,
+      },
     },
   },
   {
     id: "cooking",
     label: "Cooking",
-    blurb: "Placeholder. What you like to cook and eat.",
-    items: ["A dish you're good at", "Something you want to learn", "A favorite ingredient"],
+    blurb: "I LOOOOVEEE COOKING",
+    rows: [
+      { label: "Dish I'm good at", text: "Marry Me chicken alfredo" },
+      { label: "Want to learn", text: "French onion soup" },
+      {
+        label: "Favorite ingredient",
+        text: "Thyme. It makes everything taste so much better.",
+      },
+    ],
   },
   {
     id: "design",
     label: "Design",
-    blurb: "Placeholder. Art and designs you've made, mostly in Photoshop and Procreate.",
+    blurb: "Posters and layouts I've designed in Photoshop and Illustrator.",
     pieces: [
-      { title: "Piece title", tool: "Photoshop" },
-      { title: "Piece title", tool: "Procreate" },
-      { title: "Piece title", tool: "Illustrator" },
+      {
+        title: "Playboi Carti poster",
+        tools: ["Photoshop", "Illustrator"],
+        image: {
+          src: "/art/carti-poster.jpg",
+          alt: "Magazine spread about Playboi Carti in black, white and red, with grainy photos, a large asterisk and the words I AM MUSIC",
+          width: 2000,
+          height: 1333,
+        },
+      },
+      {
+        title: "Malcolm Todd “Sweet Boy” poster",
+        tools: ["Photoshop", "Illustrator"],
+        image: {
+          src: "/art/malcolm-todd-sweet-boy-poster.jpg",
+          alt: "Magazine spread about Malcolm Todd in pink and cream, with stars, cut-out photos and his name set vertically",
+          width: 1990,
+          height: 1298,
+        },
+      },
+      {
+        title: "Dominic Fike poster",
+        tools: ["Photoshop", "Illustrator"],
+        image: {
+          src: "/art/dominic-fike-poster.jpg",
+          alt: "Magazine spread about Dominic Fike in mustard yellow and tan, with a cut-out portrait and a large asterisk",
+          width: 1988,
+          height: 1298,
+        },
+      },
     ],
   },
 ];

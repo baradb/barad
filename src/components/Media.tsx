@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { Icon } from "@/components/Icon";
-import type { Media } from "@/data/projects";
+import type { Media } from "@/data/media";
 
 const frame = "relative overflow-hidden rounded-xl bg-surface";
 
@@ -80,7 +80,7 @@ export function VideoSlot({
   );
 }
 
-const ROW_HEIGHT = 300; // px: the height a row of media aims for
+const ROW_HEIGHT = 300; // px: the height a row of media aims for by default
 const ROW_GAP = 12; // px: matches gap-3
 
 /**
@@ -88,9 +88,9 @@ const ROW_GAP = 12; // px: matches gap-3
  * needs (flex-grow = aspect ratio), so they all end up the same height. The row is
  * capped so a lone portrait photo stays small instead of filling the column.
  */
-export function MediaRow({ items }: { items: Media[] }) {
+export function MediaRow({ items, height = ROW_HEIGHT }: { items: Media[]; height?: number }) {
   const ratios = items.map((m) => m.width / m.height);
-  const maxWidth = ratios.reduce((a, b) => a + b, 0) * ROW_HEIGHT + (items.length - 1) * ROW_GAP;
+  const maxWidth = ratios.reduce((a, b) => a + b, 0) * height + (items.length - 1) * ROW_GAP;
 
   return (
     <div className="flex items-start gap-3" style={{ maxWidth }}>
