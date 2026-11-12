@@ -81,21 +81,27 @@ export default function ProjectsPage() {
         <h1 className="text-3xl font-medium">Projects</h1>
       </FadeIn>
 
-      <section className="mt-10">
-        <h2 className="sr-only">Finished projects</h2>
-        <ProjectList items={projects} delay={80} />
-      </section>
-
       {current.length > 0 && (
-        <section className="mt-20">
-          <FadeIn delay={160}>
-            <h2 className="text-3xl font-medium">Currently working on</h2>
+        <section className="mt-10">
+          <FadeIn delay={80}>
+            <h2 className="text-xl font-medium">Currently working on</h2>
           </FadeIn>
-          <div className="mt-10">
-            <ProjectList items={current} delay={200} />
+          <div className="mt-6">
+            <ProjectList items={current} delay={120} />
           </div>
         </section>
       )}
+
+      <section className={current.length > 0 ? "mt-16" : "mt-10"}>
+        <FadeIn delay={current.length > 0 ? 160 : 80}>
+          <h2 className={current.length > 0 ? "text-xl font-medium" : "sr-only"}>
+            Finished projects
+          </h2>
+        </FadeIn>
+        <div className={current.length > 0 ? "mt-6" : ""}>
+          <ProjectList items={projects} delay={200} />
+        </div>
+      </section>
     </div>
   );
 }

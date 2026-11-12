@@ -10,13 +10,16 @@ type NowPlayingData =
       isPlaying: boolean;
       title?: string;
       artist?: string;
+      album?: string;
+      albumImageUrl?: string | null;
       songUrl?: string | null;
     };
 
-/** Bottom-right corner: what Barad is playing on Spotify right now (via Lanyard). */
+/** Bottom-right corner: what Barad is listening to on Spotify right now (via Lanyard). */
 export function NowPlaying() {
   // undefined = still loading, null = request failed
   const [data, setData] = useState<NowPlayingData | null | undefined>(undefined);
+  const [failedArt, setFailedArt] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -42,21 +45,29 @@ export function NowPlaying() {
 
   const track = data?.configured && data.title ? data : null;
   const loading = data === undefined;
-
-  let label = "Not listening";
-  if (loading) label = "Loading";
-  else if (track) label = "Now playing";
+  // Album cover, unless it is missing or failed to load (then the music icon stands in).
+  const art =
+    track?.albumImageUrl && track.albumImageUrl !== failedArt ? track.albumImageUrl : null;
 
   const body = (
     <>
-      <span
-        className={`flex size-8 shrink-0 items-center justify-center rounded-md ${
-          track ? "bg-accent text-on-accent" : "bg-track text-faint"
-        }`}
-      >
-        <Icon name="music" size={16} />
-      </span>
-      <span className="min-w-0 pr-1">
+      {art ? (
+        // Plain <img>: a 56px thumbnail from Spotify's CDN, no image-optimizer config needed.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={art}
+          alt={`Album cover for ${track?.album ?? track?.title}`}
+          width={56}
+          height={56}
+          onError={() => setFailedArt(art)}
+          className="size-14 shrink-0 rounded-lg bg-track object-cover"
+        />
+      ) : (
+        <span className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-track text-faint">
+          <Icon name="music" size={20} />
+        </span>
+      )}
+      <span className="min-w-0 flex-1">
         <span className="flex items-center gap-1.5 text-xs tracking-[0.01em] text-faint">
           {track && (
             <span className="relative flex size-1.5">
@@ -64,31 +75,31 @@ export function NowPlaying() {
               <span className="relative inline-flex size-1.5 rounded-full bg-accent" />
             </span>
           )}
-          {label}
+          What I&apos;m listening to
         </span>
         {loading ? (
-          <span
-            aria-hidden="true"
-            className="mt-1.5 block h-3 w-28 animate-pulse rounded bg-track motion-reduce:animate-none"
-          />
+          <span aria-hidden="true" className="mt-2 block space-y-2">
+            <span className="block h-3.5 w-32 animate-pulse rounded bg-track motion-reduce:animate-none" />
+            <span className="block h-3 w-20 animate-pulse rounded bg-track motion-reduce:animate-none" />
+          </span>
         ) : track ? (
-          <span className="block truncate text-sm font-medium text-foreground">
-            {track.title}
-            <span className="font-normal text-muted"> · {track.artist}</span>
-          </span>
+          <>
+            <span className="mt-0.5 block truncate text-base font-medium text-foreground">
+              {track.title}
+            </span>
+            <span className="block truncate text-sm text-muted">{track.artist}</span>
+          </>
         ) : (
-          <span className="block truncate text-sm text-muted">
-            Nothing to show right now
-          </span>
+          <span className="mt-0.5 block truncate text-base text-muted">Nothing right now</span>
         )}
       </span>
     </>
   );
 
-  // Inner radius = outer - padding: rounded-xl (12px) - p-1.5 (6px) = rounded-md (6px) on the icon tile.
-  // Fixed width so the tile never resizes when the track changes or loads.
+  // Inner radius = outer - padding: rounded-2xl (16px) - p-2 (8px) = rounded-lg (8px) on the cover.
+  // Fixed width and height so the tile never resizes when the track changes or loads.
   const box =
-    "flex w-[min(17.5rem,calc(100vw-2rem))] items-center gap-3 rounded-xl border border-rule bg-surface p-1.5 pr-3 shadow-[0_6px_20px_-8px_var(--shadow)]";
+    "flex h-[74px] w-[min(20rem,calc(100vw-3rem))] items-center gap-3.5 rounded-2xl border border-rule bg-surface p-2 pr-4 shadow-[0_6px_20px_-8px_var(--shadow)] sm:w-[min(20rem,calc(100vw-2rem))]";
 
   return (
     <div className="mx-auto mt-auto w-full max-w-2xl px-6 pb-[max(2rem,env(safe-area-inset-bottom))] sm:fixed sm:right-[max(1rem,env(safe-area-inset-right))] sm:bottom-[max(1rem,env(safe-area-inset-bottom))] sm:z-50 sm:mx-0 sm:w-auto sm:max-w-none sm:p-0">

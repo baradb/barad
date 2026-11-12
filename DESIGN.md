@@ -62,14 +62,19 @@ motion: name appears at once, no cursor, the background holds still.
   the window, stops its render loop when closed, skipped on touch devices.
 - `Icon`: one set, 24px grid, 1.5 stroke.
 - `SubTabs`: Interests tabs, arrow-key navigable.
-- `NowPlaying`: loading skeleton, now playing, and empty states. Reads Lanyard (Discord presence), so there is no "last played".
+- `NowPlaying`: a 320x74 tile labelled "What I'm listening to", with the album cover (music icon if missing), title and artist; loading skeleton and "Nothing right now" states. Reads Lanyard (Discord presence), so there is no "last played".
 
 ## Content surfaces
 
-- **Projects:** each project is a block with a photo area (two empty "Photo" slots until `images` are
-  added in `src/data/projects.ts`; one image renders wide, several render as a two-column grid),
-  then name, year, description and an optional link.
+- **Projects:** "Currently working on" comes first, then "Finished projects" (section headings are one step below the page title). Each project has a photo area (two empty "Photo" slots, 16:9, until `images` are added in `src/data/projects.ts`; one image renders wide at 2:1, several as a two-column grid), then name, period, description, tools and bullets.
 - **Interests:** tabs Music, Guitar, Cooking, Design, as label/value rows (not cards). Music shows the favorite album cover (rounded square) and artist photo (circle), fetched from Spotify's public oEmbed and linking back to Spotify, plus a genre line. Guitar is written notes first with a single video slot at the bottom (YouTube id or a file in `public/videos/`). Design is a three-column gallery of square artwork slots, each with a title and tool.
 - **Experience:** dated roles, newest first, with a link to the resume.
-- **Resume:** `/resume` embeds `public/resume.pdf` with a download link; says plainly when no file exists.
+- **Resume:** `/resume` shows `public/resume.png` (a picture of the PDF, regenerate it when the PDF changes) with a filled "Download PDF" button for `public/resume.pdf`; says plainly when files are missing.
 - Contact links: Resume, LinkedIn, and Email (a button: click copies the address, the text reads "Copied" for ~2s).
+
+## Entrance timing
+
+The About page waits for the typed name only on the first visit (`.intro` delays in
+`globals.css`). `TypedName` sets `data-intro-done` on `<html>` when typing ends, after which
+returning to About appears as quickly as any other tab. About also shows a small
+"currently working on" line linking to Projects, taken from `current` in `src/data/projects.ts`.

@@ -21,6 +21,7 @@ export function TypedName({ text }: { text: string }) {
       setCount(n);
       // Uneven rhythm reads as a person typing.
       if (n < text.length) timer = window.setTimeout(type, 70 + Math.random() * 90);
+      else document.documentElement.dataset.introDone = ""; // see .intro in globals.css
     }
 
     timer = window.setTimeout(type, reduce ? 0 : 350);

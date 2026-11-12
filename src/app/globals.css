@@ -104,6 +104,16 @@ li {
   animation: rise 0.4s var(--ease-out) both;
 }
 
+/* The home entrance waits for the typed name, but only on the first visit. TypedName sets
+   data-intro-done on <html> once typing ends; after that, returning to About is instant. */
+.intro {
+  animation-delay: var(--intro-delay, 0ms);
+}
+
+html[data-intro-done] .intro {
+  animation-delay: 0ms;
+}
+
 .panel-in {
   animation: rise 0.2s var(--ease-out) both;
 }
