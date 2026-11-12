@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Icon } from "@/components/Icon";
+import type { Media } from "@/data/projects";
 
 const frame = "relative overflow-hidden rounded-xl bg-surface";
 
@@ -75,6 +76,52 @@ export function VideoSlot({
     >
       <Icon name="video" size={20} />
       <span className="text-sm">Video</span>
+    </div>
+  );
+}
+
+const ROW_HEIGHT = 300; // px: the height a row of media aims for
+const ROW_GAP = 12; // px: matches gap-3
+
+/**
+ * Photos and videos side by side, never cropped. Each item is as wide as its shape
+ * needs (flex-grow = aspect ratio), so they all end up the same height. The row is
+ * capped so a lone portrait photo stays small instead of filling the column.
+ */
+export function MediaRow({ items }: { items: Media[] }) {
+  const ratios = items.map((m) => m.width / m.height);
+  const maxWidth = ratios.reduce((a, b) => a + b, 0) * ROW_HEIGHT + (items.length - 1) * ROW_GAP;
+
+  return (
+    <div className="flex items-start gap-3" style={{ maxWidth }}>
+      {items.map((m, i) => (
+        <div
+          key={m.src}
+          className="relative min-w-0 overflow-hidden rounded-xl bg-surface"
+          style={{ flex: `${ratios[i] * 1000} 1 0%`, aspectRatio: ratios[i] }}
+        >
+          {m.type === "image" ? (
+            <Image
+              src={m.src}
+              alt={m.alt}
+              fill
+              sizes="(min-width: 720px) 400px, 70vw"
+              className="object-cover"
+            />
+          ) : (
+            <video
+              controls
+              playsInline
+              preload="metadata"
+              poster={m.poster}
+              aria-label={m.label}
+              className="absolute inset-0 size-full object-cover"
+            >
+              <source src={m.src} type="video/mp4" />
+            </video>
+          )}
+        </div>
+      ))}
     </div>
   );
 }

@@ -66,7 +66,7 @@ motion: name appears at once, no cursor, the background holds still.
 
 ## Content surfaces
 
-- **Projects:** "Currently working on" comes first, then "Finished projects" (section headings are one step below the page title). Each project has a photo area (two empty "Photo" slots, 16:9, until `images` are added in `src/data/projects.ts`; one image renders wide at 2:1, several as a two-column grid), then name, period, description, tools and bullets.
+- **Projects:** "Currently working on" first, then "Finished projects". Section headings are 24px with a hairline rule under them; project names are 18px, so the two levels read apart. Each project's photos and videos sit in one uncropped row at a shared height (about 300px; a lone portrait photo stays small), described in `media` in `src/data/projects.ts`. With no media, two empty photo slots show. Videos are H.264 MP4 with a poster frame; all files in `public/projects/` have location/EXIF data stripped because the repo is public.
 - **Interests:** tabs Music, Guitar, Cooking, Design, as label/value rows (not cards). Music shows the favorite album cover (rounded square) and artist photo (circle), fetched from Spotify's public oEmbed and linking back to Spotify, plus a genre line. Guitar is written notes first with a single video slot at the bottom (YouTube id or a file in `public/videos/`). Design is a three-column gallery of square artwork slots, each with a title and tool.
 - **Experience:** dated roles, newest first, with a link to the resume.
 - **Resume:** `/resume` shows `public/resume.png` (a picture of the PDF, regenerate it when the PDF changes) with a filled "Download PDF" button for `public/resume.pdf`; says plainly when files are missing.
