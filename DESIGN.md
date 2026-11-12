@@ -1,0 +1,75 @@
+# Design
+
+<!-- impeccable:design -->
+
+## Visual World
+
+A calm, light personal site on a pastel periwinkle ground (a blue leaning purple),
+set in deep indigo ink. Two borrowed signatures carry the personality: a handwritten-style
+name that types itself out with a blinking cursor on load (from vnguyen.org) and an ASCII background revealed
+through a window at the cursor (from triho.dev). Everything else stays quiet.
+
+Mode: **Experience / Read**. The visitor is getting to know one person in a few short
+pages; the interface recedes.
+
+## Layout
+
+- One centered column, `max-w-2xl`, `px-6 sm:px-8`.
+- Header on every page: the name, then a four-link nav (About, Experience, Projects, Interests). `/resume` counts as Experience. Active page is underlined
+  in the accent, not distinguished by color alone.
+- Now-playing tile fixed bottom-right.
+- Group with spacing; hairline rules only between list rows.
+
+## Color
+
+Single light theme. Tokens live in `src/app/globals.css`.
+
+| Token | Value | Use |
+|---|---|---|
+| background | `oklch(0.928 0.03 283.7)` (#e4e5fb) | page |
+| surface | `oklch(0.965 0.016 286.1)` | now-playing tile |
+| track | `oklch(0.885 0.044 282.6)` | hover and skeleton fills |
+| rule | `oklch(0.838 0.056 282.9)` | hairlines |
+| foreground | `oklch(0.257 0.073 282.2)` | primary text |
+| muted | `oklch(0.415 0.089 283.5)` | secondary text |
+| faint | `oklch(0.503 0.083 284.7)` | tertiary text (4.8:1 on background) |
+| accent | `oklch(0.502 0.208 277.7)` | primary action, active tab, ASCII glyphs |
+
+## Typography
+
+- **Name and everything else:** Instrument Sans. The name is set large at weight 600 with tight tracking (-0.035em); there is no separate display face.
+- No monospace; the ASCII field draws its own glyphs.
+- Headings balanced, body 52ch or narrower, years in tabular numerals.
+
+## Motion
+
+One authored moment: the name types itself out with a text cursor that
+blinks hard on and off like a document caret, while typing and after (about 1.2s of typing,
+uneven rhythm). The bio and actions rise in behind it.
+Tabs (nav and Interests) share one underline that jumps to the hovered tab in a quiet
+color and back to the selected tab in the accent (fast exponential ease-out, no bounce).
+The ASCII background is fixed to the page and animates in place (drifting waves plus
+per-glyph flicker). The cursor is a soft-edged window onto it: moving the pointer moves
+the window, not the pattern. The window opens and closes with a slight ease. Reduced
+motion: name appears at once, no cursor, the background holds still.
+
+## Components
+
+- `Header`: typed name + nav. `TypedName` types it; `TabGroup`/`TabLabel` (in `tabs.tsx`) provide the shared jumping tab underline.
+- `AsciiField`: fixed canvas holding a page-anchored ASCII pattern (glyph ramp ` .:-=+*#%@` from
+  slow interfering waves). A 90px soft-edged window at the pointer reveals it, with no position
+  lag. Hidden until the first pointer move, closes after 1.2s idle or when the pointer leaves
+  the window, stops its render loop when closed, skipped on touch devices.
+- `Icon`: one set, 24px grid, 1.5 stroke.
+- `SubTabs`: Interests tabs, arrow-key navigable.
+- `NowPlaying`: loading skeleton, now playing, and empty states. Reads Lanyard (Discord presence), so there is no "last played".
+
+## Content surfaces
+
+- **Projects:** each project is a block with a photo area (two empty "Photo" slots until `images` are
+  added in `src/data/projects.ts`; one image renders wide, several render as a two-column grid),
+  then name, year, description and an optional link.
+- **Interests:** tabs Music, Guitar, Cooking, Design, as label/value rows (not cards). Music shows the favorite album cover (rounded square) and artist photo (circle), fetched from Spotify's public oEmbed and linking back to Spotify, plus a genre line. Guitar is written notes first with a single video slot at the bottom (YouTube id or a file in `public/videos/`). Design is a three-column gallery of square artwork slots, each with a title and tool.
+- **Experience:** dated roles, newest first, with a link to the resume.
+- **Resume:** `/resume` embeds `public/resume.pdf` with a download link; says plainly when no file exists.
+- Contact links: Resume, LinkedIn, and Email (a button: click copies the address, the text reads "Copied" for ~2s).

@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+/* Design tokens. Single light theme: pastel periwinkle ground, deep indigo ink.
+   Text pairs against --background: foreground ~13:1, muted ~7:1, faint ~4.8:1,
+   accent ~5:1. */
+:root {
+  --background: oklch(0.928 0.03 283.7);
+  --surface: oklch(0.965 0.016 286.1);
+  --track: oklch(0.885 0.044 282.6);
+  --rule: oklch(0.838 0.056 282.9);
+  --thumb: oklch(0.76 0.081 282.7);
+  --foreground: oklch(0.257 0.073 282.2);
+  --muted: oklch(0.415 0.089 283.5);
+  --faint: oklch(0.503 0.083 284.7);
+  --accent: oklch(0.502 0.208 277.7);
+  --accent-hover: oklch(0.446 0.201 276.8);
+  --on-accent: oklch(0.976 0.012 286.2);
+  --shadow: oklch(0 0 0 / 0.07);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-track: var(--track);
+  --color-rule: var(--rule);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-on-accent: var(--on-accent);
+  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  background: var(--background);
+  color-scheme: light;
+  scrollbar-color: var(--thumb) var(--background);
+  scrollbar-gutter: stable;
+}
+
+body {
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-kerning: normal;
+  caret-color: var(--accent);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p,
+li {
+  text-wrap: pretty;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* Links inherit color from Tailwind's reset; don't override their classes here. */
+/* Motion tokens: one ease-out curve; feedback ~150ms, entrances 200-400ms. */
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* The one authored moment: the name types itself (TypedName), then the rest rises in. */
+@keyframes caret-blink {
+  0%,
+  49.99% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Hard on/off blink, like the text caret in a document. */
+.caret {
+  animation: caret-blink 1.06s step-end infinite;
+}
+
+.rise {
+  animation: rise 0.4s var(--ease-out) both;
+}
+
+.panel-in {
+  animation: rise 0.2s var(--ease-out) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caret {
+    display: none;
+  }
+  .rise,
+  .panel-in {
+    animation: none;
+  }
+}
