@@ -14,6 +14,9 @@ export type NowPlaying =
       album?: string;
       albumImageUrl?: string | null;
       songUrl?: string | null;
+      /** When the song started and will end, in ms since epoch (for the progress bar). */
+      startedAt?: number;
+      endsAt?: number;
     };
 
 const NOT_CONFIGURED: NowPlaying = { configured: false };
@@ -27,6 +30,18 @@ type FetchLike = (
 const isObject = (v: unknown): v is Record<string, unknown> =>
   typeof v === "object" && v !== null;
 const str = (v: unknown) => (typeof v === "string" && v ? v : undefined);
+
+const MAX_SONG_MS = 6 * 3600_000; // anything longer is nonsense (or a podcast); drop the progress
+
+/** The song's start and end times, if Lanyard sent sensible ones. */
+function timing(v: unknown): { startedAt: number; endsAt: number } | null {
+  if (!isObject(v)) return null;
+  const { start, end } = v;
+  if (typeof start !== "number" || typeof end !== "number") return null;
+  if (!Number.isFinite(start) || !Number.isFinite(end)) return null;
+  if (end <= start || end - start > MAX_SONG_MS) return null;
+  return { startedAt: start, endsAt: end };
+}
 
 /** Turns a Lanyard API response body into what the now-playing tile needs. */
 export function toNowPlaying(body: unknown): NowPlaying {
@@ -49,6 +64,7 @@ export function toNowPlaying(body: unknown): NowPlaying {
     album: str(spotify.album),
     albumImageUrl: art?.startsWith("https://") ? art : null,
     songUrl: trackId ? `https://open.spotify.com/track/${encodeURIComponent(trackId)}` : null,
+    ...timing(spotify.timestamps),
   };
 }
 

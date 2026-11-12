@@ -8,7 +8,6 @@
   --surface: oklch(0.965 0.016 286.1);
   --track: oklch(0.885 0.044 282.6);
   --rule: oklch(0.838 0.056 282.9);
-  --thumb: oklch(0.76 0.081 282.7);
   --foreground: oklch(0.257 0.073 282.2);
   --muted: oklch(0.415 0.089 283.5);
   --faint: oklch(0.503 0.083 284.7);
@@ -36,8 +35,12 @@
 html {
   background: var(--background);
   color-scheme: light;
-  scrollbar-color: var(--thumb) var(--background);
-  scrollbar-gutter: stable;
+  /* No visible scrollbar. Wheel, touch and keyboard scrolling work as before. */
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
 }
 
 body {

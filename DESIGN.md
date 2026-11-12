@@ -62,7 +62,7 @@ motion: name appears at once, no cursor, the background holds still.
   the window, stops its render loop when closed, skipped on touch devices.
 - `Icon`: one set, 24px grid, 1.5 stroke.
 - `SubTabs`: Interests tabs, arrow-key navigable.
-- `NowPlaying`: a 320x74 tile labelled "What I'm listening to", with the album cover (music icon if missing), title and artist; loading skeleton and "Nothing right now" states. Reads Lanyard (Discord presence), so there is no "last played".
+- `NowPlaying`: a 320x98 tile labelled "What I'm listening to", with the album cover (music icon if missing), title and artist, and a progress row underneath (elapsed time, bar, total time). The browser counts the seconds itself from the song's start/end times, and asks again shortly after a song ends. Loading skeleton and "Nothing right now" states keep the same height (the progress row is reserved but hidden). Reads Lanyard (Discord presence), so there is no "last played".
 
 ## Content surfaces
 
@@ -78,3 +78,8 @@ The About page waits for the typed name only on the first visit (`.intro` delays
 `globals.css`). `TypedName` sets `data-intro-done` on `<html>` when typing ends, after which
 returning to About appears as quickly as any other tab. About also shows a small
 "currently working on" line linking to Projects, taken from `current` in `src/data/projects.ts`.
+
+## Scrollbar
+
+The page scrollbar is hidden (`scrollbar-width: none` plus the WebKit rule on `html`).
+Wheel, touch and keyboard scrolling still work; there is just no visible bar or reserved gutter.
