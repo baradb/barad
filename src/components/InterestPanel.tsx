@@ -139,7 +139,7 @@ export function InterestPanel({
           {interest.video.item ? (
             <MediaRow items={[interest.video.item]} />
           ) : (
-            <VideoSlot title="Video" />
+            <VideoSlot />
           )}
           {interest.video.caption && (
             <figcaption className="mt-3 max-w-[52ch] text-sm leading-6 text-muted">

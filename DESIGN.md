@@ -62,7 +62,7 @@ motion: name appears at once, no cursor, the background holds still.
   the window, stops its render loop when closed, skipped on touch devices.
 - `Icon`: one set, 24px grid, 1.5 stroke.
 - `SubTabs`: Interests tabs, arrow-key navigable.
-- `NowPlaying`: a 320x98 tile labelled "What I'm listening to", with the album cover (music icon if missing), title and artist, and a progress row underneath (elapsed time, bar, total time). The browser counts the seconds itself from the song's start/end times, and asks again shortly after a song ends. Loading skeleton and "Nothing right now" states keep the same height (the progress row is reserved but hidden). Reads Lanyard (Discord presence), so there is no "last played".
+- `NowPlaying`: a 320px-wide tile labelled "What I'm listening to", with the album cover (music icon if missing), title and artist. It is sized to its content with even 8px padding: 74px tall, or 98px when the song has start/end times and a progress row (elapsed time, bar, total) is shown. The browser counts the seconds itself and asks again shortly after a song ends. Loading and "Nothing right now" states use the compact 74px shape.
 
 ## Content surfaces
 
@@ -83,3 +83,12 @@ returning to About appears as quickly as any other tab. About also shows a small
 
 The page scrollbar is hidden (`scrollbar-width: none` plus the WebKit rule on `html`).
 Wheel, touch and keyboard scrolling still work; there is just no visible bar or reserved gutter.
+
+## Video player
+
+All videos use `VideoPlayer` (`src/components/VideoPlayer.tsx`), never the browser's own controls:
+a 64px play button centred on the video (a flat circle, no gradient or tint over the footage) and a
+thin progress bar along the bottom. Clicking anywhere plays or pauses; while playing, the button hides
+and reappears as a pause button on hover or keyboard focus. The bar can be clicked, dragged, or stepped
+with the arrow keys (5s), Home and End. There is deliberately no fullscreen, picture-in-picture, volume,
+speed or menu. Starting one video pauses any other.

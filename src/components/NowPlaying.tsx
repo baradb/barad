@@ -142,14 +142,9 @@ export function NowPlaying() {
     </div>
   );
 
-  // Always rendered, hidden when there is nothing to show, so the tile never changes height.
-  const progress = (
-    <div
-      aria-hidden="true"
-      className={`flex h-4 items-center gap-2 px-1 text-xs tabular-nums text-faint ${
-        timed ? "" : "invisible"
-      }`}
-    >
+  // Only when the song has start/end times; otherwise the tile is just the compact top row.
+  const progress = timed && (
+    <div aria-hidden="true" className="flex h-4 items-center gap-2 px-1 text-xs tabular-nums text-faint">
       <span data-time className="w-10 shrink-0 text-right">
         {clock(elapsed)}
       </span>
@@ -174,9 +169,11 @@ export function NowPlaying() {
   );
 
   // Inner radius = outer - padding: rounded-2xl (16px) - p-2 (8px) = rounded-lg (8px) on the cover.
-  // Fixed size so the tile never resizes when the track changes, loads, or has no timing.
-  const box =
-    "flex h-[98px] w-[min(20rem,calc(100vw-3rem))] flex-col justify-between rounded-2xl border border-rule bg-surface p-2 shadow-[0_6px_20px_-8px_var(--shadow)] sm:w-[min(20rem,calc(100vw-2rem))]";
+  // Sized to its content with even padding all round: 74px (cover + padding + border), or 98px
+  // with the progress row. It only changes height when a song with timing starts or stops.
+  const box = `flex ${
+    timed ? "h-[98px]" : "h-[74px]"
+  } w-[min(20rem,calc(100vw-3rem))] flex-col justify-between rounded-2xl border border-rule bg-surface p-2 shadow-[0_6px_20px_-8px_var(--shadow)] sm:w-[min(20rem,calc(100vw-2rem))]`;
 
   return (
     <div className="mx-auto mt-auto w-full max-w-2xl px-6 pb-[max(2rem,env(safe-area-inset-bottom))] sm:fixed sm:right-[max(1rem,env(safe-area-inset-right))] sm:bottom-[max(1rem,env(safe-area-inset-bottom))] sm:z-50 sm:mx-0 sm:w-auto sm:max-w-none sm:p-0">

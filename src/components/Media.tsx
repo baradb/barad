@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Icon } from "@/components/Icon";
+import { VideoPlayer } from "@/components/VideoPlayer";
 import type { Media } from "@/data/media";
 
 const frame = "relative overflow-hidden rounded-xl bg-surface";
@@ -33,43 +34,8 @@ export function PhotoSlot({
   );
 }
 
-/** A video (YouTube or file), or an empty labelled slot when none is set. */
-export function VideoSlot({
-  youtubeId,
-  videoSrc,
-  title,
-}: {
-  youtubeId?: string;
-  videoSrc?: string;
-  title: string;
-}) {
-  if (youtubeId) {
-    return (
-      <div className={`${frame} aspect-video`}>
-        <iframe
-          src={`https://www.youtube-nocookie.com/embed/${encodeURIComponent(youtubeId)}`}
-          title={title}
-          loading="lazy"
-          allow="accelerometer; encrypted-media; picture-in-picture"
-          allowFullScreen
-          className="absolute inset-0 size-full border-0"
-        />
-      </div>
-    );
-  }
-  if (videoSrc) {
-    return (
-      <div className={`${frame} aspect-video`}>
-        <video
-          src={videoSrc}
-          controls
-          preload="metadata"
-          aria-label={title}
-          className="absolute inset-0 size-full object-cover"
-        />
-      </div>
-    );
-  }
+/** An empty labelled slot for a video that has not been added yet. */
+export function VideoSlot() {
   return (
     <div
       className={`${frame} aspect-video flex flex-col items-center justify-center gap-2 border border-dashed border-rule text-muted`}
@@ -109,16 +75,7 @@ export function MediaRow({ items, height = ROW_HEIGHT }: { items: Media[]; heigh
               className="object-cover"
             />
           ) : (
-            <video
-              controls
-              playsInline
-              preload="metadata"
-              poster={m.poster}
-              aria-label={m.label}
-              className="absolute inset-0 size-full object-cover"
-            >
-              <source src={m.src} type="video/mp4" />
-            </video>
+            <VideoPlayer src={m.src} poster={m.poster} label={m.label} />
           )}
         </div>
       ))}
