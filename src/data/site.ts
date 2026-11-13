@@ -6,6 +6,7 @@ export const site = {
   // Set to "" to hide the Email button. Clicking it copies the address.
   email: "bbadri@uwaterloo.ca",
   linkedin: "https://www.linkedin.com/in/baradb",
+  discord: "https://discord.com/users/667921439504072724",
   // /resume shows public/resume.png (a picture of the PDF) with a button to download
   // public/resume.pdf. If you change the PDF, the PNG needs regenerating from it.
   resume: "/resume.pdf",

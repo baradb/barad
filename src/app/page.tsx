@@ -46,6 +46,16 @@ export default function Home() {
             LinkedIn
             <span className="sr-only">(opens in a new tab)</span>
           </a>
+          <a
+            href={site.discord}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={quietLink}
+          >
+            <Icon name="discord" />
+            Discord
+            <span className="sr-only">(opens in a new tab)</span>
+          </a>
           {site.email && <CopyEmail email={site.email} className={quietLink} />}
         </div>
       </FadeIn>

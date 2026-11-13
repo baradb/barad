@@ -43,6 +43,9 @@ const icons = {
     </>
   ),
   check: <path d="M20 6 9 17l-5-5" />,
+  discord: (
+    <path d="M18.9 5.6A16.3 16.3 0 0 0 14.8 4.3a11.4 11.4 0 0 0-.5 1.1 15 15 0 0 0-4.5 0 11 11 0 0 0-.5-1.1 16.3 16.3 0 0 0-4.1 1.3C2.7 9.4 2 13.1 2.3 16.8a16.4 16.4 0 0 0 5 2.5 12 12 0 0 0 1-1.7 10.6 10.6 0 0 1-1.7-.8l.4-.3a11.7 11.7 0 0 0 10 0l.4.3a10.6 10.6 0 0 1-1.7.8 12 12 0 0 0 1 1.7 16.3 16.3 0 0 0 5-2.5c.4-4.3-.6-8-2.6-11.2ZM9.3 14.6c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Zm5.4 0c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Z" />
+  ),
   download: (
     <>
       <path d="M12 15V3M7 10l5 5 5-5" />
@@ -50,6 +53,9 @@ const icons = {
     </>
   ),
 } satisfies Record<string, ReactNode>;
+
+// These glyphs are solid shapes, drawn with fill instead of the default stroke.
+const filled = new Set<keyof typeof icons>(["discord"]);
 
 export function Icon({
   name,
@@ -60,13 +66,14 @@ export function Icon({
   size?: number;
   className?: string;
 }) {
+  const solid = filled.has(name);
   return (
     <svg
       width={size}
       height={size}
       viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
+      fill={solid ? "currentColor" : "none"}
+      stroke={solid ? "none" : "currentColor"}
       strokeWidth={1.5}
       strokeLinecap="round"
       strokeLinejoin="round"

@@ -147,12 +147,11 @@ export function NowPlaying() {
     </div>
   );
 
-  // Playing = a two-line tile with a cover (74px). Idle = a short one-line chip.
-  const box = `flex ${
-    track ? "h-[74px]" : "h-11"
-  } w-[min(20rem,calc(100vw-3rem))] flex-col justify-center rounded-2xl border border-rule bg-surface p-2 ${
-    track ? "" : "px-3.5"
-  } shadow-[0_6px_20px_-8px_var(--shadow)] sm:w-[min(20rem,calc(100vw-2rem))]`;
+  // Playing = a two-line card with a cover (74px, fixed 320px wide). Idle = a short
+  // one-line chip that shrinks to fit its text instead of stretching to 320px.
+  const box = track
+    ? "flex h-[74px] w-[min(20rem,calc(100vw-3rem))] flex-col justify-center rounded-2xl border border-rule bg-surface p-2 shadow-[0_6px_20px_-8px_var(--shadow)] sm:w-[min(20rem,calc(100vw-2rem))]"
+    : "flex h-11 w-fit max-w-[min(20rem,calc(100vw-3rem))] flex-col justify-center rounded-2xl border border-rule bg-surface px-3.5 shadow-[0_6px_20px_-8px_var(--shadow)]";
 
   return (
     <div className="mx-auto mt-auto w-full max-w-2xl px-6 pb-[max(2rem,env(safe-area-inset-bottom))] sm:fixed sm:right-[max(1rem,env(safe-area-inset-right))] sm:bottom-[max(1rem,env(safe-area-inset-bottom))] sm:z-50 sm:mx-0 sm:w-auto sm:max-w-none sm:p-0">
