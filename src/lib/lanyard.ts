@@ -17,6 +17,8 @@ export type NowPlaying =
       /** When the song started and will end, in ms since epoch (for the progress bar). */
       startedAt?: number;
       endsAt?: number;
+      /** Discord status: "online" | "idle" | "dnd" | "offline" (lowercase). */
+      status?: string;
     };
 
 const NOT_CONFIGURED: NowPlaying = { configured: false };
@@ -48,17 +50,19 @@ export function toNowPlaying(body: unknown): NowPlaying {
   if (!isObject(body) || body.success !== true || !isObject(body.data)) {
     return NOT_CONFIGURED; // not in the Lanyard server, or an unexpected reply
   }
+  const status = str(body.data.discord_status)?.toLowerCase();
   const spotify = body.data.spotify;
-  if (!isObject(spotify)) return { configured: true, isPlaying: false };
+  if (!isObject(spotify)) return { configured: true, isPlaying: false, status };
 
   const title = str(spotify.song);
-  if (!title) return { configured: true, isPlaying: false };
+  if (!title) return { configured: true, isPlaying: false, status };
 
   const trackId = str(spotify.track_id);
   const art = str(spotify.album_art_url);
   return {
     configured: true,
     isPlaying: true,
+    status,
     title,
     artist: str(spotify.artist)?.replaceAll("; ", ", "), // Lanyard joins artists with ";"
     album: str(spotify.album),

@@ -15,6 +15,7 @@ type NowPlayingData =
       songUrl?: string | null;
       startedAt?: number;
       endsAt?: number;
+      status?: string;
     };
 
 const POLL_MS = 30_000;
@@ -22,7 +23,7 @@ const END_GRACE_MS = 1_500; // after a song ends, give Lanyard a moment before a
 const RETRY_MS = 5_000; // and do not ask more often than this while it still reports the old song
 
 /** 83000 -> "1:23", 3725000 -> "1:02:05" */
-function clock(ms: number) {
+function trackClock(ms: number) {
   const total = Math.max(0, Math.floor(ms / 1000));
   const h = Math.floor(total / 3600);
   const m = Math.floor((total % 3600) / 60);
@@ -30,7 +31,13 @@ function clock(ms: number) {
   return h > 0 ? `${h}:${String(m).padStart(2, "0")}:${s}` : `${m}:${s}`;
 }
 
-/** Bottom-right corner: what Barad is listening to on Spotify right now (via Lanyard). */
+/** The visitor's local wall-clock, e.g. "9:04 PM". */
+function wallClock(ms: number) {
+  if (!ms) return "";
+  return new Date(ms).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+}
+
+/** Bottom-right corner: Barad's Discord status, or what he's listening to (via Lanyard). */
 export function NowPlaying() {
   // undefined = still loading, null = request failed
   const [data, setData] = useState<NowPlayingData | null | undefined>(undefined);
@@ -76,43 +83,54 @@ export function NowPlaying() {
   const endsAt = track?.endsAt;
   const timed = startedAt !== undefined && endsAt !== undefined;
 
+  // Tick every second: advances the song progress and keeps the wall-clock current.
   useEffect(() => {
-    if (startedAt === undefined || endsAt === undefined) return;
     const id = setInterval(() => {
       const t = Date.now();
       setNow(t);
-      // The song is over: look for the next one soon instead of waiting for the next poll.
-      if (t > endsAt + END_GRACE_MS && t - lastFetch.current > RETRY_MS) loadRef.current();
+      if (timed && endsAt !== undefined && t > endsAt + END_GRACE_MS && t - lastFetch.current > RETRY_MS) {
+        loadRef.current();
+      }
     }, 1000);
     return () => clearInterval(id);
-  }, [startedAt, endsAt]);
+  }, [timed, endsAt]);
 
-  const duration = timed ? endsAt - startedAt : 0;
-  const elapsed = timed ? Math.min(Math.max(now - startedAt, 0), duration) : 0;
+  const duration = timed ? endsAt! - startedAt! : 0;
+  const elapsed = timed ? Math.min(Math.max(now - startedAt!, 0), duration) : 0;
   const percent = timed ? (elapsed / duration) * 100 : 0;
 
-  // Album cover, unless it is missing or failed to load (then the music icon stands in).
+  // Album cover, unless it is missing or failed to load.
   const art =
     track?.albumImageUrl && track.albumImageUrl !== failedArt ? track.albumImageUrl : null;
 
+  // Label: "listening to" while a song plays, otherwise the Discord status (lowercase).
+  const status = data?.configured ? data.status : undefined;
+  const label = loading ? "" : track ? "listening to" : (status ?? "offline");
+  const nowClock = wallClock(now);
+
+  // The leftmost square: album art while playing, otherwise nothing (no music icon when idle).
+  const leading = track ? (
+    art ? (
+      // Plain <img>: a 56px thumbnail from Spotify's CDN, no image-optimizer config needed.
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={art}
+        alt={`Album cover for ${track.album ?? track.title}`}
+        width={56}
+        height={56}
+        onError={() => setFailedArt(art)}
+        className="size-14 shrink-0 rounded-lg bg-track object-cover"
+      />
+    ) : (
+      <span className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-track text-faint">
+        <Icon name="music" size={20} />
+      </span>
+    )
+  ) : null;
+
   const top = (
     <div className="flex h-14 items-center gap-3.5 pr-2">
-      {art ? (
-        // Plain <img>: a 56px thumbnail from Spotify's CDN, no image-optimizer config needed.
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={art}
-          alt={`Album cover for ${track?.album ?? track?.title}`}
-          width={56}
-          height={56}
-          onError={() => setFailedArt(art)}
-          className="size-14 shrink-0 rounded-lg bg-track object-cover"
-        />
-      ) : (
-        <span className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-track text-faint">
-          <Icon name="music" size={20} />
-        </span>
-      )}
+      {leading}
       <span className="min-w-0 flex-1">
         <span className="flex items-center gap-1.5 text-xs tracking-[0.01em] text-faint">
           {track && (
@@ -121,7 +139,17 @@ export function NowPlaying() {
               <span className="relative inline-flex size-1.5 rounded-full bg-accent" />
             </span>
           )}
-          what i&apos;m listening to right now
+          <span data-label>{label}</span>
+          {nowClock && (
+            <>
+              <span aria-hidden="true" className="text-faint/60">
+                ·
+              </span>
+              <span data-clock className="tabular-nums">
+                {nowClock}
+              </span>
+            </>
+          )}
         </span>
         {loading ? (
           <span aria-hidden="true" className="mt-2 block space-y-2">
@@ -136,7 +164,9 @@ export function NowPlaying() {
             <span className="block truncate text-sm text-muted">{track.artist}</span>
           </>
         ) : (
-          <span className="mt-0.5 block truncate text-base text-muted">Nothing right now</span>
+          <span className="mt-0.5 block truncate text-base text-muted">
+            not listening to anything
+          </span>
         )}
       </span>
     </div>
@@ -146,7 +176,7 @@ export function NowPlaying() {
   const progress = timed && (
     <div aria-hidden="true" className="flex h-4 items-center gap-2 px-1 text-xs tabular-nums text-faint">
       <span data-time className="w-10 shrink-0 text-right">
-        {clock(elapsed)}
+        {trackClock(elapsed)}
       </span>
       <span className="h-1 min-w-0 flex-1 overflow-hidden rounded-full bg-track">
         <span
@@ -156,7 +186,7 @@ export function NowPlaying() {
         />
       </span>
       <span data-time className="w-10 shrink-0">
-        {clock(duration)}
+        {trackClock(duration)}
       </span>
     </div>
   );

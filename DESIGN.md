@@ -64,7 +64,7 @@ motion: name appears at once, no cursor, the background holds still.
   over ~0.75s, then fading; capped at 6 concurrent ripples, and skipped under reduced motion.
 - `Icon`: one set, 24px grid, 1.5 stroke.
 - `SubTabs`: Interests tabs, arrow-key navigable.
-- `NowPlaying`: a 320px-wide tile labelled "what i'm listening to right now" (all lowercase), with the album cover (music icon if missing), title and artist. It is sized to its content with even 8px padding: 74px tall, or 98px when the song has start/end times and a progress row (elapsed time, bar, total) is shown. The browser counts the seconds itself and asks again shortly after a song ends. Loading and "Nothing right now" states use the compact 74px shape.
+- `NowPlaying`: a 320px-wide tile. The label line is Barad's Discord status (lowercase: online/idle/dnd/offline) when nothing is playing, or "listening to" with a pulsing accent dot while a song plays; the visitor's local time is shown next to it. When idle there is no cover/icon box and the tile reads "not listening to anything"; while playing it shows the album cover, title and artist. Sized to its content with even 8px padding: 74px tall, or 98px when the song has start/end times and a progress row (elapsed time, bar, total) is shown. The browser counts the song seconds itself and asks Lanyard again shortly after a song ends; the status and clock come from the same Lanyard poll.
 
 ## Content surfaces
 
