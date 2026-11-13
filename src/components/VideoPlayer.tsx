@@ -36,6 +36,14 @@ export function VideoPlayer({
     if (v && v.readyState >= 1 && Number.isFinite(v.duration)) setDuration(v.duration);
   }, []);
 
+  // Pause when this page stops being the visible one. Next keeps the pages you leave mounted
+  // (hidden) so they restore instantly, and React runs effect cleanups when it hides them, so
+  // this is what stops the sound after you switch tabs. It also covers the video unmounting.
+  useEffect(() => {
+    const el = video.current;
+    return () => el?.pause();
+  }, []);
+
   function toggle() {
     const v = video.current;
     if (!v) return;

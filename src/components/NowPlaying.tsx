@@ -121,7 +121,7 @@ export function NowPlaying() {
               <span className="relative inline-flex size-1.5 rounded-full bg-accent" />
             </span>
           )}
-          What I&apos;m listening to
+          what i&apos;m listening to right now
         </span>
         {loading ? (
           <span aria-hidden="true" className="mt-2 block space-y-2">
