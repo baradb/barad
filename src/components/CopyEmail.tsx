@@ -10,7 +10,15 @@ const RESET_MS = 1800;
  * Both labels share one grid cell so the button never changes width. If the browser
  * blocks clipboard access, it falls back to opening the user's mail app.
  */
-export function CopyEmail({ email, className = "" }: { email: string; className?: string }) {
+export function CopyEmail({
+  email,
+  className = "",
+  labelClassName = "",
+}: {
+  email: string;
+  className?: string;
+  labelClassName?: string;
+}) {
   const [copied, setCopied] = useState(false);
   const timer = useRef(0);
 
@@ -40,15 +48,17 @@ export function CopyEmail({ email, className = "" }: { email: string; className?
         className={`cursor-pointer ${className}`}
       >
         <Icon name={copied ? "check" : "mail"} />
-        <span className="inline-grid text-left">
-          <span aria-hidden="true" className={`${label} ${copied ? "invisible opacity-0" : ""}`}>
-            {email}
-          </span>
-          <span
-            aria-hidden="true"
-            className={`${label} text-accent ${copied ? "" : "invisible opacity-0"}`}
-          >
-            Copied
+        <span className={labelClassName}>
+          <span className="inline-grid text-left">
+            <span aria-hidden="true" className={`${label} ${copied ? "invisible opacity-0" : ""}`}>
+              {email}
+            </span>
+            <span
+              aria-hidden="true"
+              className={`${label} text-accent ${copied ? "" : "invisible opacity-0"}`}
+            >
+              Copied
+            </span>
           </span>
         </span>
       </button>

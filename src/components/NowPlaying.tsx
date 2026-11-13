@@ -138,20 +138,25 @@ export function NowPlaying() {
 
   // Idle / loading: a single compact line (just the status, or a skeleton).
   const idleBody = (
-    <div className="flex items-center pr-1">
+    <div className="flex flex-col justify-center py-0.5 pr-1">
       {loading ? (
         <span aria-hidden="true" className="h-3.5 w-28 animate-pulse rounded bg-track motion-reduce:animate-none" />
       ) : (
-        statusLine
+        <>
+          <span className="text-[10px] leading-none tracking-[0.08em] text-faint/70 uppercase">
+            status
+          </span>
+          <span className="mt-1">{statusLine}</span>
+        </>
       )}
     </div>
   );
 
-  // Playing = a two-line card with a cover (74px, fixed 320px wide). Idle = a short
-  // one-line chip that shrinks to fit its text instead of stretching to 320px.
+  // Playing = a two-line card with a cover (74px, fixed 320px wide). Idle = a small
+  // two-line chip ("status" label + status word) that fits its content.
   const box = track
     ? "flex h-[74px] w-[min(20rem,calc(100vw-3rem))] flex-col justify-center rounded-2xl border border-rule bg-surface p-2 shadow-[0_6px_20px_-8px_var(--shadow)] sm:w-[min(20rem,calc(100vw-2rem))]"
-    : "flex h-11 w-fit max-w-[min(20rem,calc(100vw-3rem))] flex-col justify-center rounded-2xl border border-rule bg-surface px-3.5 shadow-[0_6px_20px_-8px_var(--shadow)]";
+    : "flex w-fit max-w-[min(20rem,calc(100vw-3rem))] flex-col justify-center rounded-2xl border border-rule bg-surface px-3.5 py-2.5 shadow-[0_6px_20px_-8px_var(--shadow)]";
 
   return (
     <div className="mx-auto mt-auto w-full max-w-2xl px-6 pb-[max(2rem,env(safe-area-inset-bottom))] sm:fixed sm:right-[max(1rem,env(safe-area-inset-right))] sm:bottom-[max(1rem,env(safe-area-inset-bottom))] sm:z-50 sm:mx-0 sm:w-auto sm:max-w-none sm:p-0">

@@ -6,7 +6,11 @@ import { current } from "@/data/projects";
 import { site } from "@/data/site";
 
 const quietLink =
-  "inline-flex min-h-11 items-center gap-2 text-sm font-medium text-muted underline-offset-4 transition-colors hover:text-foreground hover:underline";
+  "group inline-flex min-h-11 items-center gap-2 rounded-lg text-sm font-medium text-muted transition-colors hover:text-foreground focus-visible:text-foreground";
+
+// The label slides open on hover or keyboard focus; collapsed to just the icon otherwise.
+const slideLabel =
+  "max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-[max-width,opacity] duration-300 ease-out group-hover:max-w-[12rem] group-hover:opacity-100 group-focus-visible:max-w-[12rem] group-focus-visible:opacity-100 motion-reduce:transition-none";
 
 export default function Home() {
   const now = current[0];
@@ -32,31 +36,33 @@ export default function Home() {
             See projects
             <Icon name="arrow-up-right" />
           </Link>
-          <Link href="/resume" className={quietLink}>
+          <Link href="/resume" className={quietLink} aria-label="Resume">
             <Icon name="file-text" />
-            Resume
+            <span className={slideLabel}>Resume</span>
           </Link>
           <a
             href={site.linkedin}
             target="_blank"
             rel="noopener noreferrer"
             className={quietLink}
+            aria-label="LinkedIn (opens in a new tab)"
           >
             <Icon name="linkedin" />
-            LinkedIn
-            <span className="sr-only">(opens in a new tab)</span>
+            <span className={slideLabel}>LinkedIn</span>
           </a>
           <a
             href={site.discord}
             target="_blank"
             rel="noopener noreferrer"
             className={quietLink}
+            aria-label="Discord (opens in a new tab)"
           >
             <Icon name="discord" />
-            Discord
-            <span className="sr-only">(opens in a new tab)</span>
+            <span className={slideLabel}>Discord</span>
           </a>
-          {site.email && <CopyEmail email={site.email} className={quietLink} />}
+          {site.email && (
+            <CopyEmail email={site.email} className={quietLink} labelClassName={slideLabel} />
+          )}
         </div>
       </FadeIn>
 
