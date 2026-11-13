@@ -12,6 +12,11 @@ const IDLE_MS = 1200; // still pointer: start closing the window after this long
 const TAU_IN = 70; // ms: how fast the window eases open
 const TAU_OUT = 240; // ms: how fast it eases shut
 
+// Click ripple: a thin ring of the same pattern travels out from the click and fades.
+const RIPPLE_MS = 750; // how long one ripple lives
+const RIPPLE_MAX = 240; // px the ring travels
+const RIPPLE_BAND = 26; // px thickness of the glowing ring
+
 /**
  * A window onto a hidden ASCII background. The pattern is fixed to the page and
  * animates in place; the cursor only reveals the part of it under a soft circle.
@@ -22,9 +27,6 @@ export function AsciiField() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    // Fine pointer + hover only: on touch there is no cursor to follow.
-    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
-
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
@@ -44,6 +46,8 @@ export function AsciiField() {
     let prev = 0;
     let frame = 0;
     let running = false;
+    // Live click ripples: each reveals a travelling ring of the pattern, then dies.
+    const ripples: { x: number; y: number; start: number }[] = [];
 
     function resize() {
       if (!canvas || !ctx) return;
@@ -76,15 +80,34 @@ export function AsciiField() {
       return (h >>> 0) % 6;
     }
 
+    // The glyph index for a page cell at a moment, or 0 for blank. Shared by window + ripple.
+    function glyphAt(c: number, r: number, time: number) {
+      const v = Math.min(1, Math.max(0, (field(c, r, time) - 0.22) / 0.62));
+      let index = Math.round(v * (RAMP.length - 1));
+      if (!still) {
+        const flick = hash(c, r, step(time));
+        if (flick === 0) index -= 1;
+        else if (flick === 5) index += 1;
+      }
+      return Math.min(RAMP.length - 1, Math.max(0, index));
+    }
+
+    const step = (time: number) => Math.floor(time / 140);
+
     function draw(now: number) {
       if (!ctx) return;
       ctx.clearRect(0, 0, width, height);
+      drawWindow(now);
+      drawRipples(now);
+    }
+
+    function drawWindow(now: number) {
+      if (!ctx) return;
       const eased = vis * vis * (3 - 2 * vis); // smoothstep
       if (eased <= 0.002) return;
 
       const radius = RADIUS * (0.8 + 0.2 * eased); // opens slightly as it eases in
       const time = still ? 0 : now;
-      const step = Math.floor(time / 140);
 
       const c0 = Math.floor((x - radius) / CELL_W);
       const c1 = Math.ceil((x + radius) / CELL_W);
@@ -102,18 +125,53 @@ export function AsciiField() {
           const k = Math.min(1, (1 - d) / EDGE);
           const aperture = k * k * (3 - 2 * k);
 
-          const v = Math.min(1, Math.max(0, (field(c, r, time) - 0.22) / 0.62));
-          let index = Math.round(v * (RAMP.length - 1));
-          if (!still) {
-            const flick = hash(c, r, step);
-            if (flick === 0) index -= 1;
-            else if (flick === 5) index += 1;
-          }
-          index = Math.min(RAMP.length - 1, index);
+          const index = glyphAt(c, r, time);
           if (index <= 0) continue;
 
           ctx.globalAlpha = 0.4 * aperture * eased;
           ctx.fillText(RAMP[index], cx, cy);
+        }
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    // Each ripple reveals a thin ring of the same pattern, expanding and fading out.
+    function drawRipples(now: number) {
+      if (!ctx || ripples.length === 0) return;
+      const time = still ? 0 : now;
+
+      for (let i = ripples.length - 1; i >= 0; i--) {
+        const rp = ripples[i];
+        const age = (now - rp.start) / RIPPLE_MS;
+        if (age >= 1) {
+          ripples.splice(i, 1);
+          continue;
+        }
+        const ease = 1 - (1 - age) * (1 - age); // ease-out: fast then settling
+        const ringR = ease * RIPPLE_MAX;
+        const fade = 1 - age; // whole ring dims as it travels
+        const reach = ringR + RIPPLE_BAND;
+
+        const c0 = Math.floor((rp.x - reach) / CELL_W);
+        const c1 = Math.ceil((rp.x + reach) / CELL_W);
+        const r0 = Math.floor((rp.y - reach) / CELL_H);
+        const r1 = Math.ceil((rp.y + reach) / CELL_H);
+
+        for (let r = r0; r <= r1; r++) {
+          for (let c = c0; c <= c1; c++) {
+            const cx = c * CELL_W + CELL_W / 2;
+            const cy = r * CELL_H + CELL_H / 2;
+            const dist = Math.hypot(cx - rp.x, cy - rp.y);
+            // Only the thin band around the current radius lights up.
+            const band = 1 - Math.abs(dist - ringR) / RIPPLE_BAND;
+            if (band <= 0) continue;
+
+            const index = glyphAt(c, r, time);
+            if (index <= 0) continue;
+
+            ctx.globalAlpha = 0.4 * band * fade;
+            ctx.fillText(RAMP[index], cx, cy);
+          }
         }
       }
       ctx.globalAlpha = 1;
@@ -128,8 +186,9 @@ export function AsciiField() {
       if (target === 0 && vis < 0.004) vis = 0;
 
       draw(now);
-      if (vis > 0 || target > 0) frame = requestAnimationFrame(tick);
-      else running = false; // fully closed: stop the loop until the next move
+      // Keep going while the window is open or any ripple is still alive.
+      if (vis > 0 || target > 0 || ripples.length > 0) frame = requestAnimationFrame(tick);
+      else running = false;
     }
 
     function start() {
@@ -151,21 +210,35 @@ export function AsciiField() {
       inside = false;
     }
 
+    function onClick(e: MouseEvent) {
+      if (still) return; // no ripple under reduced motion
+      ripples.push({ x: e.clientX, y: e.clientY, start: performance.now() });
+      if (ripples.length > 6) ripples.shift(); // cap concurrent ripples
+      start();
+    }
+
     // relatedTarget is null when the pointer leaves the browser window.
     function onOut(e: MouseEvent) {
       if (!e.relatedTarget) inside = false;
     }
 
     resize();
-    window.addEventListener("pointermove", onMove, { passive: true });
     window.addEventListener("resize", resize);
-    document.addEventListener("mouseout", onOut);
-    window.addEventListener("blur", onBlur);
+    // The ripple works for any pointer, including touch.
+    window.addEventListener("pointerdown", onClick, { passive: true });
+    // The cursor window is hover + fine-pointer only.
+    const hoverCapable = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    if (hoverCapable) {
+      window.addEventListener("pointermove", onMove, { passive: true });
+      document.addEventListener("mouseout", onOut);
+      window.addEventListener("blur", onBlur);
+    }
 
     return () => {
       cancelAnimationFrame(frame);
-      window.removeEventListener("pointermove", onMove);
       window.removeEventListener("resize", resize);
+      window.removeEventListener("pointerdown", onClick);
+      window.removeEventListener("pointermove", onMove);
       document.removeEventListener("mouseout", onOut);
       window.removeEventListener("blur", onBlur);
     };

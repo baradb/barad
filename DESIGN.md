@@ -59,7 +59,9 @@ motion: name appears at once, no cursor, the background holds still.
 - `AsciiField`: fixed canvas holding a page-anchored ASCII pattern (glyph ramp ` .:-=+*#%@` from
   slow interfering waves). A 90px soft-edged window at the pointer reveals it, with no position
   lag. Hidden until the first pointer move, closes after 1.2s idle or when the pointer leaves
-  the window, stops its render loop when closed, skipped on touch devices.
+  the window, stops its render loop when closed, skipped on touch devices. A click (any pointer,
+  touch included) sends a thin ring of the same pattern rippling outward from the click point
+  over ~0.75s, then fading; capped at 6 concurrent ripples, and skipped under reduced motion.
 - `Icon`: one set, 24px grid, 1.5 stroke.
 - `SubTabs`: Interests tabs, arrow-key navigable.
 - `NowPlaying`: a 320px-wide tile labelled "what i'm listening to right now" (all lowercase), with the album cover (music icon if missing), title and artist. It is sized to its content with even 8px padding: 74px tall, or 98px when the song has start/end times and a progress row (elapsed time, bar, total) is shown. The browser counts the seconds itself and asks again shortly after a song ends. Loading and "Nothing right now" states use the compact 74px shape.
