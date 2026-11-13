@@ -10,7 +10,7 @@ const quietLink =
 
 // The label slides open on hover or keyboard focus; collapsed to just the icon otherwise.
 const slideLabel =
-  "max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-[max-width,opacity] duration-500 ease-out group-hover:max-w-[12rem] group-hover:opacity-100 group-focus-visible:max-w-[12rem] group-focus-visible:opacity-100 motion-reduce:transition-none";
+  "max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-[max-width,opacity] duration-[650ms] ease-out group-hover:max-w-[12rem] group-hover:opacity-100 group-focus-visible:max-w-[12rem] group-focus-visible:opacity-100 motion-reduce:transition-none";
 
 export default function Home() {
   const now = current[0];
