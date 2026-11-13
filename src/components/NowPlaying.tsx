@@ -143,8 +143,8 @@ export function NowPlaying() {
         <span aria-hidden="true" className="h-3.5 w-28 animate-pulse rounded bg-track motion-reduce:animate-none" />
       ) : (
         <>
-          <span className="text-[10px] leading-none tracking-[0.08em] text-faint/70 uppercase">
-            status
+          <span className="text-[10px] leading-none tracking-[0.08em] text-faint/70 lowercase">
+            my status
           </span>
           <span className="mt-1">{statusLine}</span>
         </>
