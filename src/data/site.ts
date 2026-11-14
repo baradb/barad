@@ -1,7 +1,7 @@
 /** Site-wide content. */
 export const site = {
   name: "Barad Badri",
-  tagline: "mech @ uwaterloo",
+  tagline: "mech eng @ uwaterloo",
   status: "currently unemployed, and really good at it",
   // Set to "" to hide the Email button. Clicking it copies the address.
   email: "bbadri@uwaterloo.ca",

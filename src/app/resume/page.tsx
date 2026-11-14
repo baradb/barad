@@ -10,6 +10,13 @@ export const metadata: Metadata = {
   title: "Resume",
 };
 
+// Download link styled like the home social icons: just the icon, with a label
+// that slides open on hover or keyboard focus.
+const quietLink =
+  "group inline-flex min-h-11 items-center gap-2 rounded-lg text-sm font-medium text-muted transition-colors hover:text-foreground focus-visible:text-foreground";
+const slideLabel =
+  "max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-[max-width,opacity] duration-[650ms] ease-out group-hover:max-w-[12rem] group-hover:opacity-100 group-focus-visible:max-w-[12rem] group-focus-visible:opacity-100 motion-reduce:transition-none";
+
 const inPublic = (url: string) =>
   existsSync(path.join(process.cwd(), "public", url.replace(/^\//, "")));
 
@@ -26,11 +33,12 @@ export default function ResumePage() {
           {hasPdf && (
             <a
               href={site.resume}
-              download="Barad_Badri_Resume.pdf"
-              className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-accent px-4 text-sm font-medium text-on-accent transition-[background-color,transform] duration-150 hover:bg-accent-hover active:scale-[0.98]"
+              download="BaradBadri_Resume.pdf"
+              className={quietLink}
+              aria-label="Download resume PDF"
             >
               <Icon name="download" />
-              Download PDF
+              <span className={slideLabel}>Download PDF</span>
             </a>
           )}
         </div>

@@ -79,7 +79,7 @@ export function NowPlaying() {
 
   // Label: "listening to" while a song plays, otherwise the Discord status (lowercase).
   const status = data?.configured ? data.status : undefined;
-  const label = loading ? "" : track ? "listening to" : (status ?? "offline");
+  const label = loading ? "" : track ? "listening to rn" : (status ?? "offline");
   const nowClock = wallClock(now);
   // The pulsing dot shows while listening, or when the Discord status is online.
   const showDot = !loading && (!!track || status === "online");
