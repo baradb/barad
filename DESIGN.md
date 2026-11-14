@@ -50,12 +50,20 @@ Tabs (nav and Interests) share one underline that jumps to the hovered tab in a 
 color and back to the selected tab in the accent (fast exponential ease-out, no bounce).
 The ASCII background is fixed to the page and animates in place (drifting waves plus
 per-glyph flicker). The cursor is a soft-edged window onto it: moving the pointer moves
-the window, not the pattern. The window opens and closes with a slight ease. Reduced
-motion: name appears at once, no cursor, the background holds still.
+the window, not the pattern. The window opens and closes with a slight ease.
+
+Behind everything sits an ambient backdrop: a faint periwinkle dot grid (masked to fade
+out behind the central text column) over a few big, soft, slowly drifting blobs. Every
+so often an ASCII shooting star streaks diagonally across the page — not one glyph string
+sliding, but a trail of fixed cells that light up as the head passes and then blink and
+fade in place, like LEDs being driven. Reduced motion: name appears at once, no cursor,
+the background blobs hold still, and no shooting stars spawn.
 
 ## Components
 
 - `Header`: typed name + nav. `TypedName` types it; `TabGroup`/`TabLabel` (in `tabs.tsx`) provide the shared jumping tab underline.
+- `AmbientBackground`: pure-CSS idle backdrop at `-z-20`. A faint dot grid (radial-gradient, 24px, masked to fade behind the center column) over three large blurred periwinkle blobs drifting on 34/42/50s loops. Pointer-events-none; blobs freeze under reduced motion.
+- `ShootingStars`: a full-screen canvas at `-z-10` that spawns an occasional ASCII shooting star (every ~4.5–11.5s). Each star's trail is fixed world-space cells spaced one glyph apart; a cell lights when the head crosses it, then blinks between glyphs (can go momentarily dark) and fades over ~420ms, so the streak reads as LEDs flickering in place rather than a sliding shape. Skipped entirely under reduced motion.
 - `AsciiField`: fixed canvas holding a page-anchored ASCII pattern (glyph ramp ` .:-=+*#%@` from
   slow interfering waves). A 90px soft-edged window at the pointer reveals it, with no position
   lag. Hidden until the first pointer move, closes after 1.2s idle or when the pointer leaves

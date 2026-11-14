@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Instrument_Sans } from "next/font/google";
 import "./globals.css";
+import { AmbientBackground } from "@/components/AmbientBackground";
 import { AsciiField } from "@/components/AsciiField";
+import { ShootingStars } from "@/components/ShootingStars";
 import { Header } from "@/components/Header";
 import { NowPlaying } from "@/components/NowPlaying";
 import { site } from "@/data/site";
@@ -44,6 +46,8 @@ export default function RootLayout({
         >
           Skip to content
         </a>
+        <AmbientBackground />
+        <ShootingStars />
         <AsciiField />
         <div className="w-full px-6 sm:px-8">
           <div className="mx-auto w-full max-w-2xl">

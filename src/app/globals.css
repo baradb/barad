@@ -130,3 +130,87 @@ html[data-intro-done] .intro {
     animation: none;
   }
 }
+
+/* Ambient idle background: dot grid + slow drifting periwinkle blobs. */
+.ambient-dots {
+  background-image: radial-gradient(
+    var(--faint) 1.4px,
+    transparent 1.9px
+  );
+  background-size: 24px 24px;
+  opacity: 0.38;
+  /* Fade the dots out behind the central column so text sits on calm space,
+     but keep them clearly visible across the margins. */
+  mask-image: radial-gradient(ellipse 46% 52% at 50% 40%, transparent 48%, black 100%);
+  -webkit-mask-image: radial-gradient(ellipse 46% 52% at 50% 40%, transparent 48%, black 100%);
+}
+
+.ambient-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(70px);
+  will-change: transform;
+}
+
+.ambient-blob-1 {
+  top: -12%;
+  left: -8%;
+  width: 46vw;
+  height: 46vw;
+  background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+  opacity: 0.5;
+  animation: ambient-drift-1 34s ease-in-out infinite alternate;
+}
+
+.ambient-blob-2 {
+  bottom: -16%;
+  right: -10%;
+  width: 52vw;
+  height: 52vw;
+  background: radial-gradient(circle, var(--accent-hover) 0%, transparent 70%);
+  opacity: 0.44;
+  animation: ambient-drift-2 42s ease-in-out infinite alternate;
+}
+
+.ambient-blob-3 {
+  top: 26%;
+  right: 16%;
+  width: 36vw;
+  height: 36vw;
+  background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+  opacity: 0.32;
+  animation: ambient-drift-3 50s ease-in-out infinite alternate;
+}
+
+@keyframes ambient-drift-1 {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(12vw, 8vh) scale(1.15);
+  }
+}
+
+@keyframes ambient-drift-2 {
+  from {
+    transform: translate(0, 0) scale(1.1);
+  }
+  to {
+    transform: translate(-14vw, -6vh) scale(1);
+  }
+}
+
+@keyframes ambient-drift-3 {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(-8vw, 10vh) scale(1.2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-blob {
+    animation: none;
+  }
+}
