@@ -8,6 +8,7 @@ const HEAD = "@#%";
 const TAILSET = "#%*+=-:.";
 const GLOW = "99, 102, 241"; // bluish-purple (indigo), used at low opacity behind the head
 const GLOW_RADIUS = 46; // px; soft halo around the moving tip
+const TRAIL_LEN = 150; // px; length of the brief purple streak dragged behind the tip
 const CELL = 13; // px between glyphs in a trail
 const MIN_GAP = 4500; // ms between stars (randomised up to +MAX_EXTRA)
 const MAX_EXTRA = 7000;
@@ -90,18 +91,50 @@ export function ShootingStars() {
         // How far along its path the head has travelled (in px from the start point).
         const headDist = speed * age;
 
-        // Soft bluish-purple halo trailing the moving tip. Fades in with the star,
-        // then out over its last stretch so it never pops off.
-        if (hx > -GLOW_RADIUS && hx < width + GLOW_RADIUS && hy > -GLOW_RADIUS && hy < height + GLOW_RADIUS) {
+        // Soft bluish-purple glow that wraps the moving tip like fire on a meteor,
+        // plus a brief streak dragged behind it. Fades in with the star, then out
+        // over its last stretch so nothing pops off.
+        if (hx > -GLOW_RADIUS - TRAIL_LEN && hx < width + GLOW_RADIUS + TRAIL_LEN && hy > -GLOW_RADIUS - TRAIL_LEN && hy < height + GLOW_RADIUS + TRAIL_LEN) {
           const fadeIn = Math.min(1, age / 250);
           const fadeOut = Math.min(1, (s.life - age) / 600);
-          const glowA = 0.22 * fadeIn * Math.max(0, fadeOut);
-          if (glowA > 0.004) {
-            const g = ctx.createRadialGradient(hx, hy, 0, hx, hy, GLOW_RADIUS);
+          const env = fadeIn * Math.max(0, fadeOut);
+          if (env > 0.01) {
+            const ang = Math.atan2(uy, ux);
+            ctx.save();
+            ctx.translate(hx, hy);
+            ctx.rotate(ang); // +x now points along the direction of travel
+
+            // Brief purple trail: a tapering streak that drags backward (−x) from the
+            // tip and fades to nothing. Only a short length, so it reads as temporary.
+            const trailA = 0.16 * env;
+            const tg = ctx.createLinearGradient(0, 0, -TRAIL_LEN, 0);
+            tg.addColorStop(0, `rgba(${GLOW}, ${trailA})`);
+            tg.addColorStop(0.45, `rgba(${GLOW}, ${trailA * 0.45})`);
+            tg.addColorStop(1, `rgba(${GLOW}, 0)`);
+            ctx.fillStyle = tg;
+            ctx.beginPath();
+            ctx.moveTo(4, -7); // slight width at the tip
+            ctx.quadraticCurveTo(-TRAIL_LEN * 0.5, -2.5, -TRAIL_LEN, 0); // taper to a point
+            ctx.quadraticCurveTo(-TRAIL_LEN * 0.5, 2.5, 4, 7);
+            ctx.closePath();
+            ctx.fill();
+
+            // Fire cap: a radial glow scaled so it bulges ahead of and across the tip
+            // and curves back along the path, instead of a plain circle. Drawn in the
+            // rotated frame, then squashed along travel to hug the leading edge.
+            const glowA = 0.24 * env;
+            ctx.scale(1.35, 0.85); // wider across the path than along it
+            ctx.translate(GLOW_RADIUS * 0.12, 0); // nudge the glow to sit just ahead of the tip
+            const g = ctx.createRadialGradient(0, 0, 0, 0, 0, GLOW_RADIUS);
             g.addColorStop(0, `rgba(${GLOW}, ${glowA})`);
+            g.addColorStop(0.5, `rgba(${GLOW}, ${glowA * 0.4})`);
             g.addColorStop(1, `rgba(${GLOW}, 0)`);
             ctx.fillStyle = g;
-            ctx.fillRect(hx - GLOW_RADIUS, hy - GLOW_RADIUS, GLOW_RADIUS * 2, GLOW_RADIUS * 2);
+            ctx.beginPath();
+            ctx.arc(0, 0, GLOW_RADIUS, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
             ctx.fillStyle = color; // restore for the glyph fills
           }
         }
