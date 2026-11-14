@@ -138,7 +138,7 @@ html[data-intro-done] .intro {
     transparent 1.9px
   );
   background-size: 24px 24px;
-  opacity: 0.38;
+  opacity: 0.2;
   /* Fade the dots out behind the central column so text sits on calm space,
      but keep them clearly visible across the margins. */
   mask-image: radial-gradient(ellipse 46% 52% at 50% 40%, transparent 48%, black 100%);
@@ -182,6 +182,29 @@ html[data-intro-done] .intro {
   animation: ambient-drift-3 50s ease-in-out infinite alternate;
 }
 
+/* Bouncers: anchored top-left, they translate across the viewport and reverse
+   direction at each wall. Travel range keeps the blob core on screen (viewport
+   minus the blob's own size). Linear timing reads as a steady, slow drift. */
+.ambient-blob-4 {
+  top: 0;
+  left: 0;
+  width: 34vw;
+  height: 34vw;
+  background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+  opacity: 0.4;
+  animation: ambient-bounce-4 38s linear infinite;
+}
+
+.ambient-blob-5 {
+  top: 0;
+  left: 0;
+  width: 30vw;
+  height: 30vw;
+  background: radial-gradient(circle, var(--accent-hover) 0%, transparent 70%);
+  opacity: 0.36;
+  animation: ambient-bounce-5 46s linear infinite;
+}
+
 @keyframes ambient-drift-1 {
   from {
     transform: translate(0, 0) scale(1);
@@ -206,6 +229,44 @@ html[data-intro-done] .intro {
   }
   to {
     transform: translate(-8vw, 10vh) scale(1.2);
+  }
+}
+
+/* Bounce paths: each leg carries the blob to a wall, then it heads off another
+   way. Start and end match so the loop is seamless. */
+@keyframes ambient-bounce-4 {
+  0% {
+    transform: translate(2vw, 4vh);
+  }
+  25% {
+    transform: translate(64vw, 20vh);
+  }
+  50% {
+    transform: translate(40vw, 64vh);
+  }
+  75% {
+    transform: translate(6vw, 38vh);
+  }
+  100% {
+    transform: translate(2vw, 4vh);
+  }
+}
+
+@keyframes ambient-bounce-5 {
+  0% {
+    transform: translate(66vw, 6vh);
+  }
+  25% {
+    transform: translate(10vw, 30vh);
+  }
+  50% {
+    transform: translate(48vw, 66vh);
+  }
+  75% {
+    transform: translate(68vw, 44vh);
+  }
+  100% {
+    transform: translate(66vw, 6vh);
   }
 }
 
