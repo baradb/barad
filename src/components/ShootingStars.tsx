@@ -6,6 +6,8 @@ import { useEffect, useRef } from "react";
 // flickering per-cell so the streak looks like many ascii bits, not one sliding shape.
 const HEAD = "@#%";
 const TAILSET = "#%*+=-:.";
+const GLOW = "99, 102, 241"; // bluish-purple (indigo), used at low opacity behind the head
+const GLOW_RADIUS = 46; // px; soft halo around the moving tip
 const CELL = 13; // px between glyphs in a trail
 const MIN_GAP = 4500; // ms between stars (randomised up to +MAX_EXTRA)
 const MAX_EXTRA = 7000;
@@ -87,6 +89,22 @@ export function ShootingStars() {
         const py0 = ux;
         // How far along its path the head has travelled (in px from the start point).
         const headDist = speed * age;
+
+        // Soft bluish-purple halo trailing the moving tip. Fades in with the star,
+        // then out over its last stretch so it never pops off.
+        if (hx > -GLOW_RADIUS && hx < width + GLOW_RADIUS && hy > -GLOW_RADIUS && hy < height + GLOW_RADIUS) {
+          const fadeIn = Math.min(1, age / 250);
+          const fadeOut = Math.min(1, (s.life - age) / 600);
+          const glowA = 0.22 * fadeIn * Math.max(0, fadeOut);
+          if (glowA > 0.004) {
+            const g = ctx.createRadialGradient(hx, hy, 0, hx, hy, GLOW_RADIUS);
+            g.addColorStop(0, `rgba(${GLOW}, ${glowA})`);
+            g.addColorStop(1, `rgba(${GLOW}, 0)`);
+            ctx.fillStyle = g;
+            ctx.fillRect(hx - GLOW_RADIUS, hy - GLOW_RADIUS, GLOW_RADIUS * 2, GLOW_RADIUS * 2);
+            ctx.fillStyle = color; // restore for the glyph fills
+          }
+        }
 
         // LED trail: fixed cells sit at every CELL px along the path. A cell lights up
         // the moment the head passes it, then fades on its own over LED_MS — so points
