@@ -11,9 +11,8 @@ import { useEffect, useRef, useState } from "react";
 export function TypedName({ text }: { text: string }) {
   const [count, setCount] = useState(0);
   const [hovered, setHovered] = useState<number | null>(null);
-  // Click wave: origin letter + a key that restarts the staggered animation.
-  const [wave, setWave] = useState<{ origin: number; key: number } | null>(null);
-  const waveKey = useRef(0);
+  // One DOM ref per visible letter, so a click can animate each imperatively.
+  const letterRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -34,13 +33,25 @@ export function TypedName({ text }: { text: string }) {
 
   function sendWave(origin: number) {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const key = ++waveKey.current; // bump so the staggered animation restarts
-    setWave({ origin, key });
-    // Clear once the furthest letter has finished, so hover lift works again.
-    const span = Math.max(origin, text.length - 1 - origin);
-    window.setTimeout(() => {
-      setWave((cur) => (cur && cur.key === key ? null : cur));
-    }, span * 45 + 550);
+    // Hop each letter with a delay set by its distance from the clicked one, so the
+    // wave spreads outward. Driving it with the Web Animations API means a fresh
+    // click just replaces each letter's running hop — no snapping, no remount.
+    letterRefs.current.forEach((el, i) => {
+      if (!el) return;
+      const delay = Math.abs(i - origin) * 45;
+      // Start and land at the letter's resting lift (its hover state), so when the
+      // hop ends it matches the inline transform exactly — no jump under the mouse.
+      const restDist = hovered === null ? 99 : Math.abs(i - hovered);
+      const rest = restDist === 0 ? 0.26 : restDist === 1 ? 0.1 : 0;
+      el.animate(
+        [
+          { transform: `translateY(-${rest}em)` },
+          { transform: "translateY(-0.34em)", offset: 0.4 },
+          { transform: `translateY(-${rest}em)` },
+        ],
+        { duration: 500, delay, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" },
+      );
+    });
   }
 
   return (
@@ -60,19 +71,16 @@ export function TypedName({ text }: { text: string }) {
             // across reads as a smooth wave following the pointer, not hard on/off.
             const dist = hovered === null ? 99 : Math.abs(i - hovered);
             const lift = dist === 0 ? 0.26 : dist === 1 ? 0.1 : 0;
-            // On click, each letter hops in turn, staggered by its distance from the
-            // clicked one, so the wave spreads out from where you clicked.
-            const waveDelay = wave ? Math.abs(i - wave.origin) * 45 : 0;
             return (
               <span
-                key={`${i}-${wave?.key ?? 0}`}
-                className={`name-letter${wave ? " name-wave" : ""}`}
+                key={i}
+                ref={(el) => {
+                  letterRefs.current[i] = el;
+                }}
+                className="name-letter"
                 onPointerEnter={() => setHovered(i)}
                 onClick={() => sendWave(i)}
-                style={{
-                  transform: `translateY(-${lift}em)`,
-                  animationDelay: `${waveDelay}ms`,
-                }}
+                style={{ transform: `translateY(-${lift}em)` }}
               >
                 {ch}
               </span>
