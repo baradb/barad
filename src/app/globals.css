@@ -275,3 +275,29 @@ html[data-intro-done] .intro {
     animation: none;
   }
 }
+
+/* Name letters: a smooth lift driven by JS hover state. The springy ease makes
+   each letter rise and settle with a little bounce as the pointer glides across. */
+.name-letter {
+  display: inline-block;
+  transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
+}
+/* Click wave: each letter hops up and settles, staggered by animation-delay so
+   the motion spreads out from the clicked letter across the name. */
+.name-wave {
+  animation: name-wave 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes name-wave {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(-0.34em); }
+  100% { transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .name-letter {
+    transition: none;
+  }
+  .name-wave {
+    animation: none;
+  }
+}
