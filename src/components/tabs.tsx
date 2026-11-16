@@ -119,10 +119,30 @@ export function TabLabel({
   children: ReactNode;
 }) {
   const { register } = use(TabsContext);
+  const ref = useRef<HTMLElement | null>(null);
+
+  // A quick hop on the label when its tab is clicked.
+  const hop = () => {
+    const el = ref.current;
+    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    el.animate(
+      [
+        { transform: "translateY(0)" },
+        { transform: "translateY(-5px)", offset: 0.4 },
+        { transform: "translateY(0)" },
+      ],
+      { duration: 420, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" },
+    );
+  };
+
   return (
     <span
-      ref={(el) => register(index, el)}
-      className={`relative py-1 transition-colors duration-150 ${
+      ref={(el) => {
+        ref.current = el;
+        register(index, el);
+      }}
+      onClick={hop}
+      className={`relative inline-block py-1 transition-colors duration-150 ${
         selected ? "text-foreground" : "text-faint group-hover:text-foreground"
       }`}
     >
