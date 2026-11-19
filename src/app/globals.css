@@ -51,6 +51,40 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Site-wide plus-sign (crosshair) mouse cursor. SVG data URI, 24x24, hotspot in
+   the centre (12 12) so the crossing point sits on the pointed-at pixel. Applied
+   to everything, including links/buttons, so the pointer stays a plus everywhere.
+   Text fields keep the normal text caret for editing. */
+*,
+*::before,
+*::after {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg stroke='%235b3fd6' stroke-width='2.6' stroke-linecap='round'%3E%3Cline x1='12' y1='4' x2='12' y2='20'/%3E%3Cline x1='4' y1='12' x2='20' y2='12'/%3E%3C/g%3E%3C/svg%3E")
+      12 12,
+    crosshair;
+}
+
+input,
+textarea,
+[contenteditable="true"] {
+  cursor: text;
+}
+
+/* While the mouse button is held (class toggled on <html> by ClickSound), the
+   plus's legs shrink inward so it looks like it's being pressed. Same hotspot. */
+html.cursor-press,
+html.cursor-press *,
+html.cursor-press *::before,
+html.cursor-press *::after {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg stroke='%235b3fd6' stroke-width='2.6' stroke-linecap='round'%3E%3Cline x1='12' y1='8' x2='12' y2='16'/%3E%3Cline x1='8' y1='12' x2='16' y2='12'/%3E%3C/g%3E%3C/svg%3E")
+      12 12,
+    crosshair;
+}
+html.cursor-press input,
+html.cursor-press textarea,
+html.cursor-press [contenteditable="true"] {
+  cursor: text;
+}
+
 h1,
 h2,
 h3 {

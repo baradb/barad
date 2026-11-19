@@ -3,6 +3,7 @@ import { Instrument_Sans } from "next/font/google";
 import "./globals.css";
 import { AmbientBackground } from "@/components/AmbientBackground";
 import { AsciiField } from "@/components/AsciiField";
+import { ClickSound } from "@/components/ClickSound";
 import { ShootingStars } from "@/components/ShootingStars";
 import { Header } from "@/components/Header";
 import { NowPlaying } from "@/components/NowPlaying";
@@ -49,6 +50,7 @@ export default function RootLayout({
         <AmbientBackground />
         <ShootingStars />
         <AsciiField />
+        <ClickSound />
         <div className="w-full px-6 sm:px-8">
           <div className="mx-auto w-full max-w-2xl">
             <Header />
